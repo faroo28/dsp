@@ -3,12 +3,12 @@ This is an **experimental**, very rudimental yet quite interesting and at times 
 
 **WARNING: I am not a DSP expert, just a hobbyist. I do not claim nor guarantee in any way code or algorithm correctness.**
 
-That said, I'm really happy with this library. I'm using it as a toolbox to experiment with DSP pipelines and algorithms and it's been quite useful. Of course it's far from complete: it lacks mixing functions to combine signals,
+That said, I'm really happy with this library. I'm using it as a toolbox to experiment with DSP pipelines and algorithms and it's been quite useful. Of course it's far from complete: it lacks mixer functions to combine signals,
 a FFT implementation and many other things.
 
-I wrote all code by myself, mostly using Rick G. Lyons's *Understanding Digital Signal Processing* as reference. After nearly one year I still understand most code without problems, which should be a good sign. :grin:
+I wrote all code by myself, mostly using Rick G. Lyons's *Understanding Digital Signal Processing* as reference. After nearly one year I still understand most code without problems; this should be a good sign. :grin:
 
-My approach was quite different from that of other libraries. The library was born as an experiment with compiler optimizations and above all vectorization, thus pipelines are entirely configured at compile time and immutable at runtime. The code is very generic, templates and constexpr are everywhere. Pipelines are built by functional-style composition; evaluation is lazy, but the library tries to compute in advance everything known at compile time.
+My approach was quite different from that of other libraries. The library was born as an experiment with compiler optimizations and above all vectorization, thus pipelines are entirely configured at compile time and immutable at runtime. The code is very generic, templates and constexpr are everywhere. Pipelines are built by functional-style composition; evaluation is lazy, but the library tries to compute in advance everything possible at compile time.
 
 ```c++
 #include "dsp.hpp"
