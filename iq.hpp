@@ -103,6 +103,9 @@ struct value_type<GenericIQ<T>>
 };
 
 template<typename T>
+constexpr GenericIQ<T> J<GenericIQ<T>>{ 0, 1 };
+
+template<typename T>
 [[gnu::pure]]
 inline constexpr T real(GenericIQ<T> const& s) noexcept {
     return s.I;
@@ -123,7 +126,7 @@ inline constexpr GenericIQ<T> conj(GenericIQ<T> const& s) noexcept {
 template<typename T>
 [[gnu::pure]]
 inline constexpr GenericIQ<T> proj(GenericIQ<T> const& s) noexcept {
-    return std::proj(s);
+    return std::proj(static_cast<std::complex<T>>(s));
 }
 
 template<typename T>
@@ -147,7 +150,7 @@ inline constexpr T norm(GenericIQ<T> const& s) noexcept {
 template<typename T>
 [[gnu::pure]]
 inline constexpr GenericIQ<T> exp(GenericIQ<T> const& s) noexcept {
-    return std::exp(s);
+    return std::exp(static_cast<std::complex<T>>(s));
 }
 
 

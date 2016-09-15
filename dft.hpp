@@ -42,7 +42,7 @@ public:
 
     [[gnu::pure]]
     constexpr sample_type operator()(Index m) const noexcept {
-        constexpr value_type sign = Inverse ? 1 : -1;
+        constexpr sample_type sign = Inverse ? J<sample_type> : -J<sample_type>;
         sample_type result{};
 
         for (Index n = 0; n < transform_type::size; ++n) {

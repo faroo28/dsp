@@ -147,8 +147,8 @@ namespace detail
         using original_ratio = Ratio;
         using ratio = ratio_simplify<original_ratio>;
 
-        static constexpr std::size_t N = ratio::num;
-        static constexpr std::size_t D = ratio::den;
+        static constexpr Index N = ratio::num;
+        static constexpr Index D = ratio::den;
 
         static constexpr resample_mode mode =
             (N == D) ? resample_mode::none

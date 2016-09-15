@@ -37,12 +37,12 @@ public:
     using sample_type = GenericIQ<typename Signal::value_type>;
     using value_type = typename Signal::value_type;
 
-    using transform_type = GenericDynDFT<false>;
+    using transform_type = GenericDynDFT<Inverse>;
     using signal_type = Signal;
 
     [[gnu::pure]]
     sample_type operator()(Index m) const noexcept {
-        constexpr value_type sign = Inverse ? 1 : -1;
+        constexpr sample_type sign = Inverse ? J<sample_type> : -J<sample_type>;
         sample_type result{};
 
         for (Index n = 0; n < settings.size; ++n) {
@@ -53,7 +53,7 @@ public:
     }
 
 private:
-    friend DynDFTImpl transform<false, Signal>(transform_type const&, Signal const&) noexcept;
+    friend DynDFTImpl transform<Inverse, Signal>(transform_type const&, Signal const&) noexcept;
 
     constexpr DynDFTImpl(transform_type const& settings, signal_type const& s) noexcept
       : settings(settings), s(s)

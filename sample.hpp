@@ -19,6 +19,12 @@ template<typename T>
 using value_type_t = typename value_type<T>::type;
 
 template<typename T>
+constexpr T J;
+
+template<typename T>
+constexpr std::complex<T> J<std::complex<T>>{ 0, 1 };
+
+template<typename T>
 [[gnu::pure]]
 inline constexpr value_type_t<T> I(T const& s) noexcept {
     using namespace std;
