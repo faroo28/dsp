@@ -11,7 +11,7 @@ std::array<IQ, 51200> input{};
 
 const auto pipeline = resample<std::ratio<48000, 240000>>(
     demod(
-        WBFMDemod(240000),
+        WBFM(240000),
         resample<std::ratio<240000, 2400000>>(
             filter(
                 wbfm_filter,

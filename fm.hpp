@@ -1,6 +1,7 @@
 #pragma once
 
 #include "cmp.hpp"
+#include "iq.hpp"
 #include "pi.hpp"
 #include "sample.hpp"
 
@@ -8,56 +9,98 @@ namespace dsp
 {
 
 template<typename Signal>
-class FMDemodImpl;
+class FMMod;
 
-class FMDemod
+template<typename Signal>
+class FMDemod;
+
+class FM
 {
 public:
-    constexpr FMDemod(std::size_t dev, std::size_t fs) noexcept
+    constexpr FM(std::size_t dev, std::size_t fs) noexcept
         : dev(dev), fs(fs)
         {}
 
 private:
     template<typename>
-    friend class FMDemodImpl;
+    friend class FMMod;
+
+    template<typename>
+    friend class FMDemod;
 
     template<typename T>
     constexpr T fac() const noexcept {
-        return T(fs) / (generic_two_pi<T> * T(dev));
+        return T(dev) / T(fs) * generic_two_pi<T>;
     }
 
     std::size_t dev;
     std::size_t fs;
 };
 
-class NBFMDemod : public FMDemod
+class NBFM : public FM
 {
 public:
-    constexpr NBFMDemod(std::size_t fs) noexcept
-        : FMDemod(2500, fs)
+    constexpr NBFM(std::size_t fs) noexcept
+        : FM(2500, fs)
         {}
 };
 
-class WBFMDemod : public FMDemod
+class WBFM : public FM
 {
 public:
-    constexpr WBFMDemod(std::size_t fs) noexcept
-        : FMDemod(75000, fs)
+    constexpr WBFM(std::size_t fs) noexcept
+        : FM(75000, fs)
         {}
 };
 
+template<typename Signal>
+constexpr FMMod<Signal> mod(FM const& settings, Signal const& s) noexcept;
 
 template<typename Signal>
-constexpr FMDemodImpl<Signal> demod(FMDemod const& settings, Signal const& s) noexcept;
+class FMMod
+{
+public:
+    using sample_type = GenericIQ<typename Signal::value_type>;
+    using value_type = typename Signal::value_type;
+
+    using modulation_type = FM;
+    using signal_type = Signal;
+
+    constexpr sample_type operator()(Index n) const noexcept {
+        accum += clamp(I(s(n)), -1.0f, 1.0f) * fac;
+        return exp(accum);
+    }
+
+private:
+    friend FMMod mod<Signal>(modulation_type const&, signal_type const&) noexcept;
+
+    constexpr FMMod(modulation_type const& settings, signal_type const& s) noexcept
+        : fac(J<sample_type>*settings.fac<value_type>()), s(s), accum()
+        {}
+
+    sample_type const fac;
+    signal_type const s;
+
+    sample_type mutable accum;
+};
 
 template<typename Signal>
-class FMDemodImpl
+inline constexpr FMMod<Signal> mod(FM const& settings, Signal const& s) noexcept {
+    return { settings, s };
+}
+
+
+template<typename Signal>
+constexpr FMDemod<Signal> demod(FM const& settings, Signal const& s) noexcept;
+
+template<typename Signal>
+class FMDemod
 {
 public:
     using sample_type = typename Signal::value_type;
     using value_type = sample_type;
 
-    using demod_type = FMDemod;
+    using modulation_type = FM;
     using signal_type = Signal;
 
     [[gnu::pure]]
@@ -66,10 +109,10 @@ public:
     }
 
 private:
-    friend FMDemodImpl demod<Signal>(demod_type const&, signal_type const&) noexcept;
+    friend FMDemod demod<Signal>(modulation_type const&, signal_type const&) noexcept;
 
-    constexpr FMDemodImpl(demod_type const& settings, signal_type const& s) noexcept
-        : fac(settings.fac<value_type>()), s(s)
+    constexpr FMDemod(modulation_type const& settings, signal_type const& s) noexcept
+        : fac(1/settings.fac<value_type>()), s(s)
         {}
 
     value_type const fac;
@@ -77,7 +120,7 @@ private:
 };
 
 template<typename Signal>
-inline constexpr FMDemodImpl<Signal> demod(FMDemod const& settings, Signal const& s) noexcept {
+inline constexpr FMDemod<Signal> demod(FM const& settings, Signal const& s) noexcept {
     return { settings, s };
 }
 

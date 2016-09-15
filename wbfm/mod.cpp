@@ -7,27 +7,25 @@
 
 using namespace dsp;
 
-using input_sample_t = IQ;
-using output_sample_t = float;
+using input_sample_t = float;
+using output_sample_t = IQ;
 
-static constexpr std::size_t fs_in = 2400000;
-static constexpr std::size_t fs_middle = 240000;
-static constexpr std::size_t fs_out = 48000;
+static constexpr std::size_t fs_in = 48000;
+static constexpr std::size_t fs_out = 2400000;
 
-static constexpr std::size_t block_size = 51200;
+static constexpr std::size_t block_size = 1024;
 static constexpr std::size_t block_count = 4;
 static constexpr std::size_t output_block_size =
     block_size * fs_out / fs_in;
 
 static std::array<input_sample_t, block_size * block_count> input{};
 
-const auto pipeline = resample<std::ratio<fs_out, fs_middle>>(
-    demod(
-        WBFM(fs_middle),
-        resample<std::ratio<fs_middle, fs_in>>(
-            filter(
-                wbfm_filter,
-                periodic<block_size*block_count>(source(input))))));
+const auto pipeline = mod(
+    WBFM(fs_out),
+    filter(
+        audio_filter,
+        resample<std::ratio<fs_out, fs_in>>(
+            periodic<block_size*block_count>(source(input)))));
 
 int main() {
     std::array<output_sample_t, output_block_size> output;

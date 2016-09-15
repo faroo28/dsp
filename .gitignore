@@ -5,6 +5,7 @@ data/
 filter/filter
 wbfm/perf
 wbfm/demod
+wbfm/mod
 
 # Compiled Object files
 *.slo
